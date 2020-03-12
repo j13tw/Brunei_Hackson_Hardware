@@ -14,7 +14,7 @@ registJson = {
 }
 
 controlJson = {"fan": 0}
-preStatus = 0
+preStatus = {"fan": 0}
 
 gcpRegist = 0
 referenceData = 0
@@ -50,17 +50,27 @@ while(True):
     portOpen = 0
     
     print("controlJson", controlJson)
-    if (preStatus != controlJson["fan"]):
+    if (preStatus["fan"] != controlJson["fan"]):
         try:
             print("serial open")
-            arduino = serial.Serial('/dev/cu.usbmodemFA1301')
+            arduino = serial.Serial(config["LOCAL_DEVICE"]["SERIAL"])
             time.sleep(3)
             arduino.write(str(json.dumps(controlJson) + "\\n").encode('utf-8'))
             arduino.close()
-            preStatus = controlJson["fan"]
+            preStatus = {}
+            preStatus["fan"] = controlJson["fan"]
             time.sleep(10)
         except:
             pass
-        
+    try:
+        sendStatus = {}
+        sendStatus["mac"] = config["LOCAL_DEVICE"]["MAC"]
+        sendStatus["sensorData"] = {}
+        sendStatus["sensorData"]["fan"] = str(preStatus["fan"])
+        print(json.dumps(sendStatus))
+        r = requests.post(config["GCP"]["SERVER_PROTOCOL"] + "://" + config["GCP"]["SERVER_IP"] + ":" + config["GCP"]["SERVER_PORT"] + "/devices", json=sendStatus)
+        print(r.text)
+    except:
+        pass
         
     time.sleep(0.5)
