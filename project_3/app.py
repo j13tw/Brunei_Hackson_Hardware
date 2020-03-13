@@ -39,11 +39,11 @@ while(True):
     print(referenceData)
     
     if (referenceData > 550): 
-        controlJson["fan"] = 1
+        controlJson["fan"] = -1
     elif (referenceData < 100): 
         controlJson["fan"] = 0
     else: 
-        controlJson["fan"] = -1
+        controlJson["fan"] = 1
     
     print(str(json.dumps(controlJson)))
     
