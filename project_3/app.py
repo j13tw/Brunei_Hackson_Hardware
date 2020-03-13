@@ -15,7 +15,6 @@ registJson = {
 
 controlJson = {"fan": 0}
 preStatusJson = {"fan": 0}
-controlStatus = 0
 
 gcpRegist = 0
 referenceData = 0
@@ -46,7 +45,7 @@ while(True):
     elif (referenceData < 100): 
         controlJson["fan"] = 0
     else:
-        controlJson["fan"] = controlStatus
+        controlJson["fan"] = preStatusJson["fan"]
     
     print(str(json.dumps(controlJson)))
     
