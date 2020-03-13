@@ -10,7 +10,7 @@ config.read('config.ini')
 
 registJson = {
     "ip": config["LOCAL_DEVICE"]["IP"],
-    "port": config["LOCAL_DEVICE"]["MAC"]
+    "mac": config["LOCAL_DEVICE"]["MAC"]
 }
 
 controlJson = {"fan": 0}
@@ -38,9 +38,9 @@ while(True):
             referenceData = int(r.json()[x].get('value'))
     print(referenceData)
     
-    if (referenceData > 700): 
+    if (referenceData > 550): 
         controlJson["fan"] = 1
-    elif (referenceData < 350): 
+    elif (referenceData < 100): 
         controlJson["fan"] = 0
     else: 
         controlJson["fan"] = -1
@@ -65,10 +65,9 @@ while(True):
     try:
         sendStatus = {}
         sendStatus["mac"] = config["LOCAL_DEVICE"]["MAC"]
-        sendStatus["sensorData"] = {}
-        sendStatus["sensorData"]["fan"] = str(preStatus["fan"])
+        sendStatus["sensorData"] = preStatus
         print(json.dumps(sendStatus))
-        r = requests.post(config["GCP"]["SERVER_PROTOCOL"] + "://" + config["GCP"]["SERVER_IP"] + ":" + config["GCP"]["SERVER_PORT"] + "/devices", json=sendStatus)
+        r = requests.post(config["GCP"]["SERVER_PROTOCOL"] + "://" + config["GCP"]["SERVER_IP"] + ":" + config["GCP"]["SERVER_PORT"] + "/insert", json=sendStatus)
         print(r.text)
     except:
         pass
