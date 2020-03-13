@@ -14,7 +14,8 @@ registJson = {
 }
 
 controlJson = {"fan": 0}
-preStatus = {"fan": 0}
+preStatusJson = {"fan": 0}
+controlStatus = 0
 
 gcpRegist = 0
 referenceData = 0
@@ -40,25 +41,27 @@ while(True):
     
     if (referenceData > 550): 
         controlJson["fan"] = -1
+    elif (referenceData < 450 and referenceData > 200): 
+        controlJson["fan"] = 1
     elif (referenceData < 100): 
         controlJson["fan"] = 0
-    else: 
-        controlJson["fan"] = 1
+    else:
+        controlJson["fan"] = controlStatus
     
     print(str(json.dumps(controlJson)))
     
     portOpen = 0
     
     print("controlJson", controlJson)
-    if (preStatus["fan"] != controlJson["fan"]):
+    if (preStatusJson["fan"] != controlJson["fan"]):
         try:
             print("serial open")
             arduino = serial.Serial(config["LOCAL_DEVICE"]["SERIAL"])
             time.sleep(3)
             arduino.write(str(json.dumps(controlJson) + "\\n").encode('utf-8'))
             arduino.close()
-            preStatus = {}
-            preStatus["fan"] = controlJson["fan"]
+            preStatusJson = {}
+            preStatusJson["fan"] = controlJson["fan"]
             time.sleep(10)
         except:
             pass
@@ -66,9 +69,9 @@ while(True):
         sendStatus = {}
         sendStatus["mac"] = config["LOCAL_DEVICE"]["MAC"]
         sendStatus["sensorData"] = {}
-        if preStatus["fan"] == 1: sendStatus["sensorData"]["fan"] = "進風"
-        if preStatus["fan"] == 0: sendStatus["sensorData"]["fan"] = "關閉"
-        if preStatus["fan"] == -1: sendStatus["sensorData"]["fan"] = "排風"
+        if preStatusJson["fan"] == 1: sendStatus["sensorData"]["fan"] = "進風"
+        if preStatusJson["fan"] == 0: sendStatus["sensorData"]["fan"] = "關閉"
+        if preStatusJson["fan"] == -1: sendStatus["sensorData"]["fan"] = "排風"
         print(json.dumps(sendStatus))
         r = requests.post(config["GCP"]["SERVER_PROTOCOL"] + "://" + config["GCP"]["SERVER_IP"] + ":" + config["GCP"]["SERVER_PORT"] + "/insert", json=sendStatus)
         print(r.text)
