@@ -65,7 +65,7 @@ while(True):
     try:
         sendStatus = {}
         sendStatus["mac"] = config["LOCAL_DEVICE"]["MAC"]
-        sendStatus["sensorData"] = preStatus
+        sendStatus["sensorData"] = {}
         if preStatus["fan"] == 1: sendStatus["sensorData"]["fan"] = "進風"
         if preStatus["fan"] == 0: sendStatus["sensorData"]["fan"] = "關閉"
         if preStatus["fan"] == -1: sendStatus["sensorData"]["fan"] = "排風"
